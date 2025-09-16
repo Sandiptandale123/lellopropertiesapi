@@ -1,9 +1,7 @@
 import {inject} from '@loopback/core';
 import {
   Count,
-  CountSchema,
-  Filter,
-  FilterExcludingWhere,
+  CountSchema, FilterExcludingWhere,
   repository,
   Where
 } from '@loopback/repository';
@@ -193,18 +191,18 @@ export class BuyerMasterController {
     description: 'Array of BuyerMaster model instances',
     content: {
       'application/json': {
-        schema: {type: 'array', items: getModelSchemaRef(BuyerMaster, {includeRelations: true})},
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(BuyerMaster, {includeRelations: true}),
+        },
       },
     },
   })
   async find(
-    @param.filter(BuyerMaster) filter?: Filter<BuyerMaster>,
     @inject(RestBindings.Http.REQUEST) req?: Request,
   ): Promise<BuyerMaster[]> {
-    const buyers = await this.buyerMasterRepository.find(filter);
-
+    const buyers = await this.buyerMasterRepository.find();
     const baseUrl = req ? `${req.protocol}://${req.headers.host}` : '';
-
     buyers.forEach(buyer => {
       if (buyer.profilePhoto) {
         buyer.profilePhoto = `${baseUrl}${buyer.profilePhoto}`;
@@ -213,7 +211,6 @@ export class BuyerMasterController {
 
     return buyers;
   }
-
 
   @get('/buyer-masters/{id}')
   @response(200, {description: 'BuyerMaster model instance', content: {'application/json': {schema: getModelSchemaRef(BuyerMaster, {includeRelations: true})}}})
