@@ -1,21 +1,21 @@
+import {inject} from '@loopback/core';
 import {
   Count,
   CountSchema,
-  Filter,
   FilterExcludingWhere,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
-  post,
-  param,
+  del,
   get,
   getModelSchemaRef,
+  param,
   patch,
-  put,
-  del,
-  requestBody,
+  post,
+  put, Request, requestBody,
   response,
+  RestBindings
 } from '@loopback/rest';
 import {RecommendedProperties} from '../models';
 import {RecommendedPropertiesRepository} from '../repositories';
@@ -23,13 +23,17 @@ import {RecommendedPropertiesRepository} from '../repositories';
 export class RecommendedPropertiesController {
   constructor(
     @repository(RecommendedPropertiesRepository)
-    public recommendedPropertiesRepository : RecommendedPropertiesRepository,
-  ) {}
+    public recommendedPropertiesRepository: RecommendedPropertiesRepository,
+  ) { }
 
   @post('/recommended-properties')
   @response(200, {
     description: 'RecommendedProperties model instance',
-    content: {'application/json': {schema: getModelSchemaRef(RecommendedProperties)}},
+    content: {
+      'application/json': {
+        schema: getModelSchemaRef(RecommendedProperties),
+      },
+    },
   })
   async create(
     @requestBody({
@@ -37,7 +41,6 @@ export class RecommendedPropertiesController {
         'application/json': {
           schema: getModelSchemaRef(RecommendedProperties, {
             title: 'NewRecommendedProperties',
-            
           }),
         },
       },
@@ -71,9 +74,10 @@ export class RecommendedPropertiesController {
     },
   })
   async find(
-    @param.filter(RecommendedProperties) filter?: Filter<RecommendedProperties>,
+    @inject(RestBindings.Http.REQUEST) req?: Request,
   ): Promise<RecommendedProperties[]> {
-    return this.recommendedPropertiesRepository.find(filter);
+    const properties = await this.recommendedPropertiesRepository.find();
+    return properties;
   }
 
   @patch('/recommended-properties')
@@ -106,7 +110,8 @@ export class RecommendedPropertiesController {
   })
   async findById(
     @param.path.number('id') id: number,
-    @param.filter(RecommendedProperties, {exclude: 'where'}) filter?: FilterExcludingWhere<RecommendedProperties>
+    @param.filter(RecommendedProperties, {exclude: 'where'})
+    filter?: FilterExcludingWhere<RecommendedProperties>,
   ): Promise<RecommendedProperties> {
     return this.recommendedPropertiesRepository.findById(id, filter);
   }
